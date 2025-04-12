@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5">
+    <title>Login & Sign Up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            background: url('https://img.freepik.com/free-vector/realistic-travel-background-with-elements_52683-77784.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: left;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: blue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: darkblue;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+        .hidden {
+            display: none;
+        }
+        .forgot-password {
+            margin-top: 10px;
+        }
+        .forgot-password a {
+            color: blue;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 id="form-title">Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="email" id="email" placeholder="Email" class="hidden">
+        <input type="tel" id="mobile" placeholder="Mobile Number" class="hidden">
+        <input type="password" id="password" placeholder="Password">
+        <input type="password" id="confirm-password" placeholder="Confirm Password" class="hidden">
+        <p class="error" id="error-message"></p>
+        <button onclick="validateForm()" id="submit-btn">Login</button>
+        <p class="forgot-password">
+            <a href="#" onclick="forgotPassword()">Forgot Password?</a>
+        </p>
+        <p>
+            <a href="#" onclick="toggleForm()" id="toggle-link">Don't have an account? Sign Up</a>
+        </p>
+    </div>
+
+    <script>
+        let isSignUp = false;
+        let users = [];
+
+        function toggleForm() {
+            isSignUp = !isSignUp;
+            document.getElementById('form-title').textContent = isSignUp ? 'Sign Up' : 'Login';
+            document.getElementById('submit-btn').textContent = isSignUp ? 'Sign Up' : 'Login';
+            document.getElementById('toggle-link').textContent = isSignUp ? 'Already have an account? Login' : "Don't have an account? Sign Up";
+            document.getElementById('email').classList.toggle('hidden', !isSignUp);
+            document.getElementById('mobile').classList.toggle('hidden', !isSignUp);
+            document.getElementById('confirm-password').classList.toggle('hidden', !isSignUp);
+        }
+
+        function validateForm() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            var email = document.getElementById('email').value;
+            var mobile = document.getElementById('mobile').value;
+            var confirmPassword = document.getElementById('confirm-password').value;
+            var errorMessage = document.getElementById('error-message');
+            
+            var passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d{4,}).{5,}$/;
+            
+            if (username === '' || password === '' || (isSignUp && (email === '' || mobile === '' || confirmPassword === ''))) {
+                errorMessage.textContent = 'All fields are required!';
+                return;
+            }
+            
+            if (!passwordPattern.test(password)) {
+                errorMessage.textContent = 'Password must contain at least one letter and at least four digits!';
+                return;
+            }
+            
+            if (isSignUp) {
+                if (password !== confirmPassword) {
+                    errorMessage.textContent = 'Passwords do not match!';
+                    return;
+                }
+                let existingUser = users.find(user => user.username === username);
+                if (existingUser) {
+                    errorMessage.textContent = 'Username already exists!';
+                    return;
+                }
+                users.push({ username, password, email, mobile });
+                alert('Sign Up Successful!');
+                toggleForm();
+            } else {
+                let user = users.find(user => user.username === username && user.password === password);
+                if (!user) {
+                    errorMessage.textContent = 'Invalid login credentials!';
+                    setTimeout(() => location.reload(), 1000);
+                    return;
+                }
+                alert('Login Successful!');
+                window.location.href = 'home.html'; 
+            }
+            errorMessage.textContent = '';
+        }
+
+        function forgotPassword() {
+            var username = document.getElementById('username').value;
+            var errorMessage = document.getElementById('error-message');
+            let user = users.find(user => user.username === username);
+            if (!user) {
+                errorMessage.textContent = 'Username not found!';
+                return;
+            }
+            user.password = 'Temp1234'; 
+            alert('Temporary password: Temp1234. Please change it after login.');
+        }
+    </script>
+</body>
+</html>
